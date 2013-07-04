@@ -116,17 +116,31 @@ module.exports.commands = function (db) {
     var args = config._.slice()
     var cmd = args.shift()
     if('link' === cmd) {
-      db.lResolve(args.shift(), config, function (err, tree, root) {
-        link(tree, function (err) {
-          if(err) throw err
-          console.log(root.name, root.version, root.hash)
-          mkdirp(path.join(process.cwd(), 'node_modules'), function () {
-            linkModule(process.cwd(), root.name, root.hash, config, cb)
-          })
-        })
+      db.lResolve(args, config, function (err, tree, root) {
+        var roots = leaves.roots(tree), n = 0
+        
+        for(var k in roots) {
+          n ++
+          ;(function (root) {
+            link(tree, function (err) {
+              if(err) throw err
+              console.log(root.name, root.version, root.hash)
+              mkdirp(path.join(process.cwd(), 'node_modules'), function () {
+                linkModule(process.cwd(), root.name, root.hash, config, next)
+              })
+            })
+          })(roots[k])
+        }
+
+        function next (err) {
+          if(err) return cb(err, n = null)
+          if(--n) return
+          cb()
+        }
+
       })
     } else if('lresolve' === cmd) {
-      db.lResolve(args.shift(), config, function (err, tree, root) {
+      db.lResolve(args, config, function (err, tree, root) {
         console.log(JSON.stringify(tree, null, 2))
         cb()
       })
