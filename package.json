@@ -1,0 +1,24 @@
+{
+  "name": "npmd-link",
+  "description": "",
+  "version": "0.0.0",
+  "homepage": "https://github.com/dominictarr/npmd-link",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dominictarr/npmd-link.git"
+  },
+  "dependencies": {
+    "npmd-leaves" : "1.0.0",
+    "pull-stream" : "2.20",
+    "pull-paramap": "1.0.1",
+    "npmd-unpack" : "1.0.1",
+    "mkdirp"      : "0.3.5"
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "set -e; for t in test/*.js; do node $t; done"
+  },
+  "author": "Dominic Tarr <dominic.tarr@gmail.com> (http://dominictarr.com)",
+  "license": "MIT"  
+}
