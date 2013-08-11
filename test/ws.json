@@ -1,0 +1,31 @@
+{
+  "fa68a14f6a945d54dbbe50d8cdb3320e9e3b1a06": {
+    "name": "commander",
+    "version": "0.6.1",
+    "hash": "fa68a14f6a945d54dbbe50d8cdb3320e9e3b1a06",
+    "shasum": "fa68a14f6a945d54dbbe50d8cdb3320e9e3b1a06"
+  },
+  "320b5a52d83abb5978d81a3e887d4aefb15a6164": {
+    "name": "tinycolor",
+    "version": "0.0.1",
+    "hash": "320b5a52d83abb5978d81a3e887d4aefb15a6164",
+    "shasum": "320b5a52d83abb5978d81a3e887d4aefb15a6164"
+  },
+  "9a3806378f316536d79038038ba90ccb724816c3": {
+    "name": "options",
+    "version": "0.0.5",
+    "hash": "9a3806378f316536d79038038ba90ccb724816c3",
+    "shasum": "9a3806378f316536d79038038ba90ccb724816c3"
+  },
+  "e315da4f86f2322e72e14f43c44b9a8f70e3087a": {
+    "name": "ws",
+    "version": "0.4.27",
+    "hash": "e315da4f86f2322e72e14f43c44b9a8f70e3087a",
+    "shasum": "077d3a48b6e0b5a96f68f3b38a94ea1ec72c2555",
+    "dependencies": {
+      "commander": "fa68a14f6a945d54dbbe50d8cdb3320e9e3b1a06",
+      "options": "9a3806378f316536d79038038ba90ccb724816c3",
+      "tinycolor": "320b5a52d83abb5978d81a3e887d4aefb15a6164"
+    }
+  }
+}
