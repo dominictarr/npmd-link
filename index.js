@@ -81,7 +81,7 @@ module.exports = function (ltree, opts, cb) {
     cb = opts, opts = {}
   var dirs = {}
   var linked = {}
-  var queue = pushable()
+//  var queue = pushable()
 
   pull(
     pull.values(ltree),
@@ -98,7 +98,6 @@ module.exports = function (ltree, opts, cb) {
           cache: opts.cache,
           target: dir
         }, function (err) {
-          console.log('unpacked', pkg.name, pkg.version)
           if(err) return cb(err)
           cb(null, pkg)
         })
