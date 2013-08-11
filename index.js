@@ -5,6 +5,9 @@ var unpack  = require('npmd-unpack').unpack
 var mkdirp  = require('mkdirp')
 var fs      = require('fs')
 var leaves  = require('npmd-leaves')
+var merge   = require('pull-merge')
+var deps    = require('get-deps')
+var pushable  = require('pull-pushable')
 
 function linkable(pkg, opts) {
   var linkRoot = (opts && opts.linkRoot)
@@ -23,6 +26,7 @@ function linkModule(moduleDir, name, hash, opts, cb) {
   var target = path.join(linkable(hash, opts), 'package')
 
   fs.readlink (source, function (err, found) {
+    console.log(source, target, found)
     if(found === target)
       done()
     else if(err)
@@ -43,40 +47,75 @@ function linkModule(moduleDir, name, hash, opts, cb) {
   }
 }
 
+//var spawn = require('child_process').spawn
+//
+//function compile(opts, cb) {
+//  var cp = spawn('node-gyp', ['rebuild'], {
+//    cwd: opts.target
+//  })
+//  cp.stdout.pipe(process.stdout)
+//  cp.stderr.pipe(process.stderr)
+//  cp.on('exit', function (code) {
+//    cb(code === 0 ? null : new Error('exit status:'+code))
+//  })
+//}
+
+function once(fun) {
+  return function () {
+    var args = [].slice.call(arguments)
+    var cb = args.pop()
+    var err = new Error('twice!')
+    var i = 0
+    args.push(function (err, val) {
+      if(i++) throw err
+      cb(err, val)
+    })
+    fun.apply(this, args)
+  }
+}
+
+
 var link = 
 module.exports = function (ltree, opts, cb) {
   if(!cb)
     cb = opts, opts = {}
   var dirs = {}
   var linked = {}
+  var queue = pushable()
+
   pull(
     pull.values(ltree),
     paramap(function (pkg, cb) {
       var dir = linkable(pkg, opts)
       if(dirs[dir]) return cb(null, pkg)
-
       fs.stat(dir, function (err) {
+
         if(dirs[dir]) return cb(null, pkg)
         dirs[dir] = true
         if(!err) return cb(null, pkg)
+
         unpack(pkg, {
           cache: opts.cache,
           target: dir
         }, function (err) {
-          cb(err, pkg)
+          console.log('unpacked', pkg.name, pkg.version)
+          if(err) return cb(err)
+          cb(null, pkg)
         })
       })
-
     }),
     pull.asyncMap(function (pkg, cb) {
       //unpack to 
       //.npmd/linkable/HASH
       //then symlink to the deps
+
       var moduleDir = path.join(linkable(pkg), 'package')
+
       if(linked[pkg.hash]) return cb(null, pkg)
       linked[pkg.hash] = true
       mkdirp(path.join(moduleDir, 'node_modules'), function () {
         var n = 0
+
         for(var name in pkg.dependencies) {
           n ++
           linkModule(moduleDir, name, pkg.dependencies[name], next)
@@ -105,9 +144,39 @@ module.exports.db = function (db, config) {
     opts.check = false
 
     db.resolve(module, opts, function (err, tree) {
+      if(err) cb(err)
       cb(err, leaves(tree), tree)
     })
   }
+}
+
+var all = module.exports.all = function (tree, opts, cb) {
+  var roots = leaves.roots(tree), n = 0
+  opts = opts || {}
+  opts.dir = opts.dir || process.cwd()
+
+  var i = 0
+  link(tree, function (err) {
+    if(err) throw err
+    if(i++) throw new Error('finished twice!')
+
+    for(var k in roots) {
+      n ++
+      ;(function (root) {
+        mkdirp(path.join(opts.dir, 'node_modules'), function () {
+        console.log(root.name, root.version, root.hash)
+          linkModule(opts.dir, root.name, root.hash, opts, next)
+        })
+      })(roots[k])
+    }
+  })
+
+  function next (err) {
+    if(err) return cb(err, n = null)
+    if(--n) return
+    cb()
+  }
+
 }
 
 module.exports.commands = function (db) {
@@ -115,34 +184,19 @@ module.exports.commands = function (db) {
   db.commands.push(function (db, config, cb) {
     var args = config._.slice()
     var cmd = args.shift()
+    if(!args.length)
+      args = deps(process.cwd(), config)
+
     if('link' === cmd) {
-      db.lResolve(args, config, function (err, tree, root) {
-        var roots = leaves.roots(tree), n = 0
-        
-        for(var k in roots) {
-          n ++
-          ;(function (root) {
-            link(tree, function (err) {
-              if(err) throw err
-              console.log(root.name, root.version, root.hash)
-              mkdirp(path.join(process.cwd(), 'node_modules'), function () {
-                linkModule(process.cwd(), root.name, root.hash, config, next)
-              })
-            })
-          })(roots[k])
-        }
-
-        function next (err) {
-          if(err) return cb(err, n = null)
-          if(--n) return
-          cb()
-        }
-
+      db.lResolve(args, config, function (err, tree) {
+        if(err) cb(err)
+        else all(tree, config, cb)
       })
     } else if('lresolve' === cmd) {
       db.lResolve(args, config, function (err, tree, root) {
+        if(err) return cb(err)
         console.log(JSON.stringify(tree, null, 2))
-        cb()
+        cb(null, tree)
       })
     }
     else
