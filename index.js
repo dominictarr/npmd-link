@@ -5,9 +5,9 @@ var unpack  = require('npmd-unpack').unpack
 var mkdirp  = require('mkdirp')
 var fs      = require('fs')
 var leaves  = require('npmd-leaves')
-var merge   = require('pull-merge')
+//var merge   = require('pull-merge')
 var deps    = require('get-deps')
-var pushable  = require('pull-pushable')
+//var pushable  = require('pull-pushable')
 
 function linkable(pkg, opts) {
   var linkRoot = (opts && opts.linkRoot)
