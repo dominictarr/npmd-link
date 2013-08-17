@@ -8,6 +8,7 @@ var leaves  = require('npmd-leaves')
 //var merge   = require('pull-merge')
 var deps    = require('get-deps')
 //var pushable  = require('pull-pushable')
+var linkBin = require('npmd-bin')
 
 function linkable(pkg, opts) {
   var linkRoot = (opts && opts.linkRoot)
@@ -165,7 +166,13 @@ var all = module.exports.all = function (tree, opts, cb) {
       ;(function (root) {
         mkdirp(path.join(installPath, 'node_modules'), function () {
         console.error(root.name + '@' + root.version + ' (' + root.hash + ')')
-          linkModule(installPath, root.name, root.hash, opts, next)
+          linkModule(installPath, root.name, root.hash, opts, function (err) {
+            if(err) return next(err)
+            if(!opts.bin) return next()
+
+            var target = path.join(linkable(root.hash, opts), 'package')
+            linkBin(target, opts.bin, next)
+          })
         })
       })(roots[k])
     }
@@ -186,10 +193,14 @@ module.exports.commands = function (db) {
   db.commands.push(function (db, config, cb) {
     var args = config._.slice()
     var cmd = args.shift()
+    if(!/link|lresolve/.test(cmd)) return
     if(!args.length)
       args = deps(config.path || process.cwd(), config)
 
-    if('link' === cmd) {
+    if(!config.bin && config.global)
+      config.bin = path.join(config.prefix, 'lib', 'bin')
+
+    if('link' === cmd) {      
       db.lResolve(args, config, function (err, tree) {
         if(err) cb(err)
         else all(tree, config, cb)
