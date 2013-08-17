@@ -1,0 +1,182 @@
+{
+  "294b268e4b0d4250f6dde19b3b8b34935dff14ef": {
+    "name": "qs",
+    "version": "0.6.5",
+    "hash": "294b268e4b0d4250f6dde19b3b8b34935dff14ef",
+    "shasum": "294b268e4b0d4250f6dde19b3b8b34935dff14ef"
+  },
+  "4c1f228b5050837eba9d21f50c2e6e320624566e": {
+    "name": "json-stringify-safe",
+    "version": "5.0.0",
+    "hash": "4c1f228b5050837eba9d21f50c2e6e320624566e",
+    "shasum": "4c1f228b5050837eba9d21f50c2e6e320624566e"
+  },
+  "0c1647a74f3af12d76a07a99490ade7c7249c8f0": {
+    "name": "forever-agent",
+    "version": "0.5.0",
+    "hash": "0c1647a74f3af12d76a07a99490ade7c7249c8f0",
+    "shasum": "0c1647a74f3af12d76a07a99490ade7c7249c8f0"
+  },
+  "ad681b68f5321ad2827c4cfb1b7d5df2cfe942ee": {
+    "name": "tunnel-agent",
+    "version": "0.3.0",
+    "hash": "ad681b68f5321ad2827c4cfb1b7d5df2cfe942ee",
+    "shasum": "ad681b68f5321ad2827c4cfb1b7d5df2cfe942ee"
+  },
+  "d93ffdbb67ac5507779be316a7d65146417beef8": {
+    "name": "assert-plus",
+    "version": "0.1.2",
+    "hash": "d93ffdbb67ac5507779be316a7d65146417beef8",
+    "shasum": "d93ffdbb67ac5507779be316a7d65146417beef8"
+  },
+  "559be18376d08a4ec4dbe80877d27818639b2df7": {
+    "name": "asn1",
+    "version": "0.1.11",
+    "hash": "559be18376d08a4ec4dbe80877d27818639b2df7",
+    "shasum": "559be18376d08a4ec4dbe80877d27818639b2df7"
+  },
+  "fe8091d468a373a0b0c9ff8bbfb3425c00973a1d": {
+    "name": "ctype",
+    "version": "0.5.2",
+    "hash": "fe8091d468a373a0b0c9ff8bbfb3425c00973a1d",
+    "shasum": "fe8091d468a373a0b0c9ff8bbfb3425c00973a1d"
+  },
+  "462265250ded81f22c0170b2e06c357ba40242a2": {
+    "name": "http-signature",
+    "version": "0.10.0",
+    "hash": "462265250ded81f22c0170b2e06c357ba40242a2",
+    "shasum": "1494e4f5000a83c0f11bcc12d6007c530cb99582",
+    "dependencies": {
+      "asn1": "559be18376d08a4ec4dbe80877d27818639b2df7",
+      "assert-plus": "d93ffdbb67ac5507779be316a7d65146417beef8",
+      "ctype": "fe8091d468a373a0b0c9ff8bbfb3425c00973a1d"
+    }
+  },
+  "3d322462badf07716ea7eb85baf88079cddce505": {
+    "name": "hoek",
+    "version": "0.9.1",
+    "hash": "3d322462badf07716ea7eb85baf88079cddce505",
+    "shasum": "3d322462badf07716ea7eb85baf88079cddce505"
+  },
+  "d8228e948e6183a6478bc2a34f662a5926dcbb68": {
+    "name": "boom",
+    "version": "0.4.2",
+    "hash": "d8228e948e6183a6478bc2a34f662a5926dcbb68",
+    "shasum": "7a636e9ded4efcefb19cef4947a3c67dfaee911b",
+    "dependencies": {
+      "hoek": "3d322462badf07716ea7eb85baf88079cddce505"
+    }
+  },
+  "829572d97f67d4ee5c56e210d50dfecd0741fc4a": {
+    "name": "cryptiles",
+    "version": "0.2.2",
+    "hash": "829572d97f67d4ee5c56e210d50dfecd0741fc4a",
+    "shasum": "ed91ff1f17ad13d3748288594f8a48a0d26f325c",
+    "dependencies": {
+      "boom": "d8228e948e6183a6478bc2a34f662a5926dcbb68"
+    }
+  },
+  "0d26395539587e92b1aa41c72da764a1516c7b7d": {
+    "name": "sntp",
+    "version": "0.2.4",
+    "hash": "0d26395539587e92b1aa41c72da764a1516c7b7d",
+    "shasum": "fb885f18b0f3aad189f824862536bceeec750900",
+    "dependencies": {
+      "hoek": "3d322462badf07716ea7eb85baf88079cddce505"
+    }
+  },
+  "c8afce16f4c572b289d8ebf1d94ef79e0f809ce7": {
+    "name": "hawk",
+    "version": "1.0.0",
+    "hash": "c8afce16f4c572b289d8ebf1d94ef79e0f809ce7",
+    "shasum": "b90bb169807285411da7ffcb8dd2598502d3b52d",
+    "dependencies": {
+      "boom": "d8228e948e6183a6478bc2a34f662a5926dcbb68",
+      "cryptiles": "829572d97f67d4ee5c56e210d50dfecd0741fc4a",
+      "hoek": "3d322462badf07716ea7eb85baf88079cddce505",
+      "sntp": "0d26395539587e92b1aa41c72da764a1516c7b7d"
+    }
+  },
+  "3d81ca69b474b1e16518728b51c24ff0bbedc6e9": {
+    "name": "aws-sign",
+    "version": "0.3.0",
+    "hash": "3d81ca69b474b1e16518728b51c24ff0bbedc6e9",
+    "shasum": "3d81ca69b474b1e16518728b51c24ff0bbedc6e9"
+  },
+  "cb540f93bb2b22a7d5941691a288d60e8ea9386e": {
+    "name": "oauth-sign",
+    "version": "0.3.0",
+    "hash": "cb540f93bb2b22a7d5941691a288d60e8ea9386e",
+    "shasum": "cb540f93bb2b22a7d5941691a288d60e8ea9386e"
+  },
+  "bc9a27d4e2b97e186cd57c9e2063cb99fa68cccc": {
+    "name": "cookie-jar",
+    "version": "0.3.0",
+    "hash": "bc9a27d4e2b97e186cd57c9e2063cb99fa68cccc",
+    "shasum": "bc9a27d4e2b97e186cd57c9e2063cb99fa68cccc"
+  },
+  "39aef510e5889a3dca9c895b506c73aae1bac048": {
+    "name": "node-uuid",
+    "version": "1.4.1",
+    "hash": "39aef510e5889a3dca9c895b506c73aae1bac048",
+    "shasum": "39aef510e5889a3dca9c895b506c73aae1bac048"
+  },
+  "58203eed86e3a5ef17aed2b7d9ebd47f0a60dd10": {
+    "name": "mime",
+    "version": "1.2.11",
+    "hash": "58203eed86e3a5ef17aed2b7d9ebd47f0a60dd10",
+    "shasum": "58203eed86e3a5ef17aed2b7d9ebd47f0a60dd10"
+  },
+  "d4b1f43a93e8296dfe02694f4680bc37a313c73f": {
+    "name": "delayed-stream",
+    "version": "0.0.5",
+    "hash": "d4b1f43a93e8296dfe02694f4680bc37a313c73f",
+    "shasum": "d4b1f43a93e8296dfe02694f4680bc37a313c73f"
+  },
+  "ea2a7906d804cde386944d1a84dfc2187ab3ee96": {
+    "name": "combined-stream",
+    "version": "0.0.4",
+    "hash": "ea2a7906d804cde386944d1a84dfc2187ab3ee96",
+    "shasum": "2d1a43347dbe9515a4a2796732e5b88473840b22",
+    "dependencies": {
+      "delayed-stream": "d4b1f43a93e8296dfe02694f4680bc37a313c73f"
+    }
+  },
+  "df63060fbf3d33286a76aaf6d55a2986d9ff8619": {
+    "name": "async",
+    "version": "0.2.9",
+    "hash": "df63060fbf3d33286a76aaf6d55a2986d9ff8619",
+    "shasum": "df63060fbf3d33286a76aaf6d55a2986d9ff8619"
+  },
+  "e378cea8ae8650e1478361aa45675af98411ab74": {
+    "name": "form-data",
+    "version": "0.1.0",
+    "hash": "e378cea8ae8650e1478361aa45675af98411ab74",
+    "shasum": "d36b59baf9b292bb2e5034d7a6079b2bd1e9df83",
+    "dependencies": {
+      "async": "df63060fbf3d33286a76aaf6d55a2986d9ff8619",
+      "combined-stream": "ea2a7906d804cde386944d1a84dfc2187ab3ee96",
+      "mime": "58203eed86e3a5ef17aed2b7d9ebd47f0a60dd10"
+    }
+  },
+  "17dcb0bf34c4ee52ba181a38d688990c3e53861c": {
+    "name": "request",
+    "version": "2.27.0",
+    "hash": "17dcb0bf34c4ee52ba181a38d688990c3e53861c",
+    "shasum": "dfb1a224dd3a5a9bade4337012503d710e538668",
+    "dependencies": {
+      "aws-sign": "3d81ca69b474b1e16518728b51c24ff0bbedc6e9",
+      "cookie-jar": "bc9a27d4e2b97e186cd57c9e2063cb99fa68cccc",
+      "forever-agent": "0c1647a74f3af12d76a07a99490ade7c7249c8f0",
+      "form-data": "e378cea8ae8650e1478361aa45675af98411ab74",
+      "hawk": "c8afce16f4c572b289d8ebf1d94ef79e0f809ce7",
+      "http-signature": "462265250ded81f22c0170b2e06c357ba40242a2",
+      "json-stringify-safe": "4c1f228b5050837eba9d21f50c2e6e320624566e",
+      "mime": "58203eed86e3a5ef17aed2b7d9ebd47f0a60dd10",
+      "node-uuid": "39aef510e5889a3dca9c895b506c73aae1bac048",
+      "oauth-sign": "cb540f93bb2b22a7d5941691a288d60e8ea9386e",
+      "qs": "294b268e4b0d4250f6dde19b3b8b34935dff14ef",
+      "tunnel-agent": "ad681b68f5321ad2827c4cfb1b7d5df2cfe942ee"
+    }
+  }
+}
