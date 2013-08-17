@@ -26,7 +26,6 @@ function linkModule(moduleDir, name, hash, opts, cb) {
   var target = path.join(linkable(hash, opts), 'package')
 
   fs.readlink (source, function (err, found) {
-    console.log(source, target, found)
     if(found === target)
       done()
     else if(err)
@@ -154,6 +153,8 @@ var all = module.exports.all = function (tree, opts, cb) {
   opts = opts || {}
   opts.dir = opts.dir || process.cwd()
 
+  var installPath = opts.path || opts.dir || process.cwd()
+
   var i = 0
   link(tree, function (err) {
     if(err) throw err
@@ -162,9 +163,9 @@ var all = module.exports.all = function (tree, opts, cb) {
     for(var k in roots) {
       n ++
       ;(function (root) {
-        mkdirp(path.join(opts.dir, 'node_modules'), function () {
-        console.log(root.name, root.version, root.hash)
-          linkModule(opts.dir, root.name, root.hash, opts, next)
+        mkdirp(path.join(installPath, 'node_modules'), function () {
+        console.error(root.name + '@' + root.version + ' (' + root.hash + ')')
+          linkModule(installPath, root.name, root.hash, opts, next)
         })
       })(roots[k])
     }
@@ -178,13 +179,15 @@ var all = module.exports.all = function (tree, opts, cb) {
 
 }
 
+module.exports.linkModule = linkModule
+
 module.exports.commands = function (db) {
   var start = Date.now()
   db.commands.push(function (db, config, cb) {
     var args = config._.slice()
     var cmd = args.shift()
     if(!args.length)
-      args = deps(process.cwd(), config)
+      args = deps(config.path || process.cwd(), config)
 
     if('link' === cmd) {
       db.lResolve(args, config, function (err, tree) {
@@ -205,4 +208,3 @@ module.exports.commands = function (db) {
   })
 }
 
-module.exports.linkModule = linkModule
