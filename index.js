@@ -168,9 +168,11 @@ var all = module.exports.all = function (tree, opts, cb) {
         console.error(root.name + '@' + root.version + ' (' + root.hash + ')')
           linkModule(installPath, root.name, root.hash, opts, function (err) {
             if(err) return next(err)
+            console.log(opts)
             if(!opts.bin) return next()
 
             var target = path.join(linkable(root.hash, opts), 'package')
+            console.log(target, opts.bin)
             linkBin(target, opts.bin, next)
           })
         })
@@ -197,10 +199,14 @@ module.exports.commands = function (db) {
     if(!args.length)
       args = deps(config.path || process.cwd(), config)
 
-    if(!config.bin && config.global)
-      config.bin = path.join(config.prefix, 'lib', 'bin')
 
-    if('link' === cmd) {      
+    if('link' === cmd){
+      if(!config.global)
+        config.bin = config.global
+          ? path.join(config.prefix, 'lib', 'bin')
+          : path.join(config.path || process.cwd(), 
+            'node_modules', '.bin')
+
       db.lResolve(args, config, function (err, tree) {
         if(err) cb(err)
         else all(tree, config, cb)
