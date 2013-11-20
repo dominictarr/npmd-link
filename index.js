@@ -1,14 +1,33 @@
+#! /usr/bin/env node
 var pull    = require('pull-stream')
 var paramap = require('pull-paramap')
 var path    = require('path')
 var unpack  = require('npmd-unpack').unpack
 var mkdirp  = require('mkdirp')
 var fs      = require('fs')
-var leaves  = require('npmd-leaves')
-//var merge   = require('pull-merge')
-var deps    = require('get-deps')
-//var pushable  = require('pull-pushable')
-var linkBin = require('npmd-bin')
+var rimraf  = require('rimraf')
+
+/***************************
+
+Link Install
+
+this installs node modules by unpacking all modules
+into a global directory (~/.npmd/linkable/HASH)
+and then symlinking all dependencies.
+
+This means that installing a very large dependency
+tree is only one symlink if dependencies are already set up.
+
+this module requires a the resolve tree to be transformed by
+the npmd-leaves module. Each module is ided by the shasum
+of it's tarball + it's dep's hashes.
+
+(so, each hash is identified by it's entire subtree)
+
+To install the tree. 
+
+****************************/
+
 
 function linkable(pkg, opts) {
   var linkRoot = (opts && opts.linkRoot)
@@ -27,19 +46,28 @@ function linkModule(moduleDir, name, hash, opts, cb) {
   var target = path.join(linkable(hash, opts), 'package')
 
   fs.readlink (source, function (err, found) {
+    //already linked
     if(found === target)
       done()
-    else if(err)
+    //there is no link.
+    else if(err && err.code === 'ENOENT')
       fs.symlink(target, source, done)
-    else 
-      fs.unlink(source, function (err) {
+    //a directory is linked, or no link.
+    //or there is a different link
+    else if (!err || (err && err.code === 'EINVAL'))
+      rimraf(source, function (err) {
         if(err) return cb(err)
         fs.symlink(target, source, done)
       })
+    else {
+      console.log(err, found)
+      done(new Error('this should never happen'))
+    }
   })
 
   function done (err) {
     if(err) {
+      console.log(err)
       err.source = source
       err.target = target
     }
@@ -47,41 +75,12 @@ function linkModule(moduleDir, name, hash, opts, cb) {
   }
 }
 
-//var spawn = require('child_process').spawn
-//
-//function compile(opts, cb) {
-//  var cp = spawn('node-gyp', ['rebuild'], {
-//    cwd: opts.target
-//  })
-//  cp.stdout.pipe(process.stdout)
-//  cp.stderr.pipe(process.stderr)
-//  cp.on('exit', function (code) {
-//    cb(code === 0 ? null : new Error('exit status:'+code))
-//  })
-//}
-
-function once(fun) {
-  return function () {
-    var args = [].slice.call(arguments)
-    var cb = args.pop()
-    var err = new Error('twice!')
-    var i = 0
-    args.push(function (err, val) {
-      if(i++) throw err
-      cb(err, val)
-    })
-    fun.apply(this, args)
-  }
-}
-
-
-var link = 
-module.exports = function (ltree, opts, cb) {
+var link =  function (ltree, opts, cb) {
   if(!cb)
     cb = opts, opts = {}
   var dirs = {}
   var linked = {}
-//  var queue = pushable()
+  //  var queue = pushable()
 
   pull(
     pull.values(ltree),
@@ -122,6 +121,7 @@ module.exports = function (ltree, opts, cb) {
         if(!n) cb()
 
         function next (err) {
+          if(err) return n=-1, cb(err)
           if(--n) return
           cb()
         }
@@ -133,24 +133,23 @@ module.exports = function (ltree, opts, cb) {
   )
 }
 
-module.exports.db = function (db, config) {
-  db.methods.lResolve = {type: 'async'}
-  db.lResolve = function (module, opts, cb) {
-    if(!cb)
-      cb = opts, opts = {}
-
-    opts.hash = true
-    opts.check = false
-
-    db.resolve(module, opts, function (err, tree) {
-      if(err) cb(err)
-      cb(err, leaves(tree), tree)
-    })
+function getRoots (tree) {
+  var deps = {}, roots = {}
+  for(var k in tree) {
+    for(var j in tree[k].dependencies)
+      deps[tree[k].dependencies[j]] = true
   }
+  for(var k in tree) {
+    var pkg = tree[k]
+    if(!deps[k])
+      roots[k] = {name: pkg.name, version: pkg.version, hash: pkg.hash}
+  }
+  return roots
 }
 
-var all = module.exports.all = function (tree, opts, cb) {
-  var roots = leaves.roots(tree), n = 0
+
+var linkAll = exports = module.exports = function (tree, opts, cb) {
+  var roots = getRoots(tree), n = 0
   opts = opts || {}
   opts.dir = opts.dir || process.cwd()
 
@@ -164,17 +163,13 @@ var all = module.exports.all = function (tree, opts, cb) {
     for(var k in roots) {
       n ++
       ;(function (root) {
-        mkdirp(path.join(installPath, 'node_modules'), function () {
-        console.error(root.name + '@' + root.version + ' (' + root.hash + ')')
-          linkModule(installPath, root.name, root.hash, opts, function (err) {
-            if(err) return next(err)
-            console.log(opts)
-            if(!opts.bin) return next()
-
-            var target = path.join(linkable(root.hash, opts), 'package')
-            console.log(target, opts.bin)
-            linkBin(target, opts.bin, next)
-          })
+        mkdirp(path.join(installPath, 'node_modules'), function (err) {
+          if(err) console.log('mkdirp err')
+          if(err) return next(err)
+          console.error(root.name + '@' + root.version + ' (' + root.hash + ')')
+          //after linking the module, is when you'd want to link it's bin if you are installing
+          //it globally. note... you'd only link root deps.
+          linkModule(installPath, root.name, root.hash, opts, next)
         })
       })(roots[k])
     }
@@ -188,40 +183,17 @@ var all = module.exports.all = function (tree, opts, cb) {
 
 }
 
-module.exports.linkModule = linkModule
+exports.linkModule = linkModule
+exports.link       = link
 
-module.exports.commands = function (db) {
-  var start = Date.now()
-  db.commands.push(function (db, config, cb) {
-    var args = config._.slice()
-    var cmd = args.shift()
-    if(!/link|lresolve/.test(cmd)) return
-    if(!args.length)
-      args = deps(config.path || process.cwd(), config)
-
-
-    if('link' === cmd){
-      if(!config.global)
-        config.bin = config.global
-          ? path.join(config.prefix, 'lib', 'bin')
-          : path.join(config.path || process.cwd(), 
-            'node_modules', '.bin')
-
-      db.lResolve(args, config, function (err, tree) {
-        if(err) cb(err)
-        else all(tree, config, cb)
+if(!module.parent) {
+  var data = ''
+  process.stdin
+    .on('data', function (d) { data += d })
+    .on('end', function () {
+      linkAll(JSON.parse(data), {}, function (err) {
+        if(err) throw err
       })
-    } else if('lresolve' === cmd) {
-      db.lResolve(args, config, function (err, tree, root) {
-        if(err) return cb(err)
-        console.log(JSON.stringify(tree, null, 2))
-        cb(null, tree)
-      })
-    }
-    else
-      return
-
-    return true
-  })
+    })
 }
 
